@@ -1,0 +1,39 @@
+# Build output
+target/
+*.class
+
+# Maven housekeeping
+release.properties
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar.lck
+
+# Logs
+*.log
+
+# IDEs / editors
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.project
+.classpath
+.settings/
+*.code-workspace
+nbproject/
+.nb-gradle/
+
+# OS noise
+.DS_Store
+.DS_Store?
+Thumbs.db
+ehthumbs.db
+
+# JVM crash logs
+hs_err_pid*
+replay_pid*
