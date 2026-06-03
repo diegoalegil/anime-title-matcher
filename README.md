@@ -1,20 +1,48 @@
-# anime-title-matcher
+<div align="center">
 
-![Java](https://img.shields.io/badge/Java-21-blue) ![Build](https://img.shields.io/badge/build-Maven-orange) ![License](https://img.shields.io/badge/license-MIT-green)
+# 🎬 anime-title-matcher
+
+**Match an AniList anime to its most probable TMDb entry — fuzzily, and explainably.**
+
+[![Java](https://img.shields.io/badge/Java-21-007396?logo=openjdk&logoColor=white)](https://openjdk.org/projects/jdk/21/)
+[![Build](https://img.shields.io/badge/build-Maven-C71A36?logo=apachemaven&logoColor=white)](https://maven.apache.org/)
+[![Tests](https://img.shields.io/badge/tests-147%20passing-2ea44f)](#running-the-tests)
+[![Runtime deps](https://img.shields.io/badge/runtime%20dependencies-0-2ea44f)](#stack)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
+</div>
 
 A small, dependency-free Java library that, given an anime from **AniList** and a list of candidate
 entries from **TMDb**, decides which candidate is the most probable equivalent — using title
-normalization, hand-written fuzzy string similarity and an explainable, multi-signal scoring model.
+normalization, hand-written fuzzy string similarity, and an explainable, multi-signal scoring model.
 
-The library does not return a bare boolean or a single number. For every match it tells you the
-chosen candidate, a score in `[0.0, 1.0]`, a confidence **decision**, a full per-signal
-**breakdown**, and a human-readable **explanation** of why that candidate won (or why nothing did).
+It never returns a bare boolean or a lone number. Every match comes with a **decision**, a
+**score** in `[0.0, 1.0]`, a full per-signal **breakdown**, and a human-readable **explanation** of
+*why* that candidate won — or why nothing did.
 
-## Objective
+## Table of contents
 
-Cross-referencing AniList and TMDb is hard because the same show appears under different titles,
-seasons, subtitles, languages, punctuation and formats. This library focuses on exactly those hard
-cases and makes every decision **testable and explainable**, so it can be reused and trusted.
+- [Why](#why) · [DondeAnime context](#dondeanime-context) · [Stack](#stack)
+- [Install](#install) · [Quick start](#quick-start) · [What you get back](#what-you-get-back)
+- [Interpreting a result](#interpreting-a-matchresult) · [Decision thresholds](#decision-thresholds)
+- [How it works](#how-it-works) · [Hard cases](#hard-cases-supported) · [Project layout](#project-layout)
+- [Tests](#running-the-tests) · [Adding cases](#adding-evaluation-cases)
+- [Limitations](#limitations) · [Roadmap](#roadmap) · [Design notes](#technical-decisions) · [License](#license)
+
+## Why
+
+Cross-referencing AniList and TMDb is hard: the same show appears under different titles, seasons,
+subtitles, languages, punctuation and formats. This library targets exactly those hard cases and
+makes every decision **testable and explainable**, so it can be reused and trusted.
+
+✨ **At a glance**
+
+- 🔤 **Robust normalization** — accents, punctuation, roman numerals, seasons, stopwords.
+- 🧮 **Hand-written similarity** — Levenshtein, Jaro-Winkler and token-set, no external library.
+- ⚖️ **Multi-signal scoring** — title, season, year, format and episodes, renormalized over what's known.
+- 🛡️ **Conflict caps, not double penalties** — a TV-vs-movie or wrong-year clash is counted once.
+- 🔎 **Explainable** — a breakdown and a sentence for every decision; deterministic ordering.
+- 🌐 **Offline & pure** — no network, no API keys, **zero runtime dependencies**.
 
 ## DondeAnime context
 
@@ -22,30 +50,27 @@ This project was extracted from **DondeAnime**, an anime "where to watch" aggreg
 currently cross-references AniList against TMDb and correctly matches **767 of 929 titles (~83%)**.
 The remaining ~17% fail on seasons, roman numerals, subtitles, Japanese-vs-international titles,
 punctuation, accents, movie-vs-series confusion, year drift, episode-count drift and alternative
-titles. This library is a robust, well-tested implementation of that matching concern, designed to
-improve on those hard cases and to be reusable as a standalone dependency.
+titles. This library is a robust, well-tested implementation of that matching concern.
 
-> The 767/929 (~83%) figure is DondeAnime's **current baseline**, measured on its full private
-> dataset. This repository does **not** claim to beat it; the real improvement can only be measured
-> inside DondeAnime against the complete dataset. The bundled sample here is a small, representative
-> fixture used to validate behaviour offline. See [docs/evaluation.md](docs/evaluation.md).
+> **Honest baseline.** The 767/929 (~83%) figure is DondeAnime's *current* baseline, measured on its
+> full private dataset. This repository does **not** claim to beat it — the real improvement can only
+> be measured inside DondeAnime against the complete dataset. The bundled sample here is a small,
+> representative fixture used to validate behaviour offline. See [docs/evaluation.md](docs/evaluation.md).
 
 ## Stack
 
-- **Java 21**, **Maven**
-- **JUnit 5** + **AssertJ** for tests
-- **Zero runtime dependencies** — Levenshtein and Jaro-Winkler are implemented by hand
-- No Spring, no Lombok, no external string-similarity library
+| | |
+| --- | --- |
+| Language / build | **Java 21**, **Maven** (with wrapper) |
+| Tests | **JUnit 5** + **AssertJ**, **JaCoCo** coverage |
+| Runtime dependencies | **none** — similarity algorithms implemented by hand |
+| Not used | Spring, Lombok, external string-similarity / fuzzy libraries |
 
-## Installation
-
-Build and install locally:
+## Install
 
 ```bash
 ./mvnw clean install
 ```
-
-Then depend on it:
 
 ```xml
 <dependency>
@@ -55,7 +80,7 @@ Then depend on it:
 </dependency>
 ```
 
-## Basic usage
+## Quick start
 
 ```java
 import com.dondeanime.animetitlematcher.api.*;
@@ -86,26 +111,33 @@ MatchResult result = matcher.findBestMatch(
 );
 
 if (result.isMatched()) {
-    MatchCandidate best = result.bestCandidate();
-    System.out.println(best.tmdbTitle().title());   // chosen TMDb title
+    System.out.println(result.bestCandidate().tmdbTitle().title());
     System.out.println(result.decision());          // e.g. HIGH_CONFIDENCE
-    System.out.println(result.score());             // 0.0 .. 1.0
     System.out.println(result.explanation().summary());
 }
 ```
 
-## Working with several candidates
+## What you get back
 
-`allCandidates()` returns every candidate scored and sorted by score, descending, so you can inspect
-the runner-up or apply your own policy:
+A `MatchResult` is fully inspectable (values below are illustrative):
+
+```text
+decision      HIGH_CONFIDENCE
+score         0.94
+best match    TMDb "Demon Slayer: Kimetsu no Yaiba" (id 85937)
+matched       "Demon Slayer: Kimetsu no Yaiba …"  ⟶  "Demon Slayer: Kimetsu no Yaiba"
+signals used  [title, year, format]
+breakdown     title 1.00 · altTitle 0.92 · season – · year 1.00 · format 1.00 · episodes – · penalty 0.00
+explanation   HIGH_CONFIDENCE: matched "…Entertainment District Arc" to
+              TMDb "Demon Slayer: Kimetsu no Yaiba" (id 85937) at 0.94.
+```
+
+Inspect or re-rank the field with `allCandidates()` (sorted by score, descending):
 
 ```java
-MatchResult result = matcher.findBestMatch(anime, candidates);
-
-for (MatchCandidate candidate : result.allCandidates()) {
-    System.out.printf("%6.3f  %s%n", candidate.score(), candidate.tmdbTitle().title());
+for (MatchCandidate c : result.allCandidates()) {
+    System.out.printf("%6.3f  %s%n", c.score(), c.tmdbTitle().title());
 }
-
 if (result.decision() == MatchDecision.AMBIGUOUS) {
     result.warnings().forEach(System.out::println);
 }
@@ -116,7 +148,7 @@ if (result.decision() == MatchDecision.AMBIGUOUS) {
 | Member | Meaning |
 | --- | --- |
 | `decision()` | `EXACT_MATCH`, `HIGH_CONFIDENCE`, `MEDIUM_CONFIDENCE`, `LOW_CONFIDENCE`, `AMBIGUOUS` or `NO_MATCH` |
-| `bestCandidate()` | the top-scoring candidate (the closest one is reported even on `NO_MATCH`; `null` only when no candidates were given) |
+| `bestCandidate()` | top-scoring candidate (the closest one is reported even on `NO_MATCH`; `null` only when no candidates were given) |
 | `score()` | the best candidate's final score in `[0.0, 1.0]` |
 | `scoreBreakdown()` | the per-signal account behind the score |
 | `allCandidates()` | every candidate, sorted by score descending |
@@ -124,95 +156,95 @@ if (result.decision() == MatchDecision.AMBIGUOUS) {
 | `explanation()` | human-readable summary, matched titles, signals used and any rejection reason |
 
 A `ScoreBreakdown` exposes `titleScore`, `alternativeTitleScore`, `seasonScore`, `yearScore`,
-`formatScore`, `episodeScore`, `penaltyScore` and `finalScore`. Signals that did not apply (for
-example a year comparison when a year is unknown) are `null` rather than `0.0`, so "absent" is
-distinguishable from "scored zero".
-
-## How normalization works
-
-Each title is run through a configurable pipeline that lower-cases, strips accents, removes bracketed
-noise, expands `&`, deletes apostrophes, turns other symbols into spaces, converts roman numerals,
-extracts season/part/cour and format markers as **metadata**, and removes a few low-value stopwords.
-The original title is always kept. Crucially, season and format markers are **not discarded** — they
-are parsed into structured metadata and reused by the scorer. Details and examples are in
-[docs/normalization.md](docs/normalization.md).
-
-## How similarity works
-
-Title similarity blends three hand-written measures, all returning `[0.0, 1.0]`:
-
-- **Levenshtein** edit distance (two-row DP, `O(n·m)` time / `O(min(n,m))` space), normalized.
-- **Jaro-Winkler**, which rewards matching characters and shared prefixes.
-- **Token-set** overlap (Jaccard and token-sort), so word reordering between Japanese and English
-  titles still scores high.
-
-These are combined by `CompositeTitleSimilarity`. See [docs/scoring.md](docs/scoring.md) for the
-exact blend.
-
-## How scoring works
-
-The final score is a weighted average of the present signals (title, season, year, format,
-episodes), renormalized so that missing data never drags a candidate down. Hard conflicts are
-enforced as score **caps**, not extra penalties, so a conflict is counted exactly once:
-
-- **TV vs movie** is the only hard format conflict (OVA/ONA/SPECIAL against TMDb `tv` is treated as a
-  mild positive, since TMDb files them under `tv`).
-- A **large year gap** caps the score so a wrong-year match cannot be reported as high confidence.
-
-Weights and thresholds are configurable via `ScoringWeights` and `MatchThresholds`. The full model,
-including default weights, is documented in [docs/scoring.md](docs/scoring.md).
+`formatScore`, `episodeScore`, `penaltyScore` and `finalScore`. Signals that did not apply are
+`null` rather than `0.0`, so "absent" is distinguishable from "scored zero".
 
 ## Decision thresholds
 
 With the default `MatchThresholds`:
 
-| Decision | Condition |
+| Decision | Default condition |
 | --- | --- |
-| `EXACT_MATCH` | titles identical after normalization, score ≥ 0.95, and no hard conflict |
+| `EXACT_MATCH` | titles identical after normalization, score ≥ 0.95, no hard conflict |
 | `HIGH_CONFIDENCE` | score ≥ 0.85 |
 | `MEDIUM_CONFIDENCE` | score ≥ 0.70 |
 | `LOW_CONFIDENCE` | score ≥ 0.55 |
 | `NO_MATCH` | score below 0.55 |
-| `AMBIGUOUS` | the best candidate is within 0.05 of the runner-up (and both clear the low threshold) |
-
-Customize them:
+| `AMBIGUOUS` | best candidate within 0.05 of the runner-up (both ≥ 0.55) |
 
 ```java
 AnimeTitleMatcher matcher = AnimeTitleMatcher.create(
-    new ScoringWeights(0.60, 0.10, 0.12, 0.10, 0.08),
+    new ScoringWeights(0.60, 0.10, 0.12, 0.10, 0.08),   // title, season, year, format, episodes
     MatchThresholds.defaults()
 );
 ```
 
+## How it works
+
+**1 · Normalize** ([details](docs/normalization.md)) — lower-case, strip accents, drop bracketed
+noise, expand `&`, delete apostrophes, symbols → spaces (kana/kanji preserved), roman numerals →
+arabic, then extract season/part/cour and format markers as **metadata** (never silently dropped),
+and remove a few stopwords. The original title is always kept.
+
+```
+"Shingeki no Kyojin Season 3 Part 2"  ⟶  "shingeki no kyojin"   (+ season 3, part 2)
+"Fate/stay night: Unlimited Blade Works"  ⟶  "fate stay night unlimited blade works"
+```
+
+**2 · Compare** ([details](docs/scoring.md)) — title similarity blends three hand-written measures,
+each in `[0,1]`: **Levenshtein** (two-row DP, `O(n·m)` time / `O(min(n,m))` space), **Jaro-Winkler**,
+and **token-set** overlap (Jaccard + token-sort) so Japanese↔English word reordering still scores high.
+
+**3 · Score** — a weighted average of the *present* signals (title, season, year, format, episodes),
+renormalized so missing data never drags a candidate down. Hard conflicts are enforced as score
+**caps**, not extra penalties:
+
+- **TV vs movie** is the only hard format conflict (OVA/ONA/SPECIAL against TMDb `tv` is a mild
+  positive — TMDb files them under `tv`).
+- A **large year gap** caps the score, so a wrong-year match can't be high confidence — this is what
+  separates *Fullmetal Alchemist* (2003) from *Brotherhood* (2009).
+
 ## Hard cases supported
 
-Seasons (`Season 3 Part 2`, `2nd Season`, `Final Season`, `Cour 2`), roman numerals (`II` → `2`),
-subtitles, Japanese vs international titles, alternative/synonym titles, punctuation
-(`Steins;Gate`, `Fate/stay night`, `Re:Zero`), accents (`Pokémon`, `Tōkyō`), movie-vs-series
-vetoes, year disambiguation (e.g. *Fullmetal Alchemist* 2003 vs *Brotherhood* 2009) and
-episode-count drift.
+Seasons (`Season 3 Part 2`, `2nd Season`, `Final Season`, `Cour 2`) · roman numerals (`II` → `2`) ·
+subtitles · Japanese vs international titles · alternative/synonym titles · punctuation
+(`Steins;Gate`, `Fate/stay night`, `Re:Zero`) · accents (`Pokémon`, `Tōkyō`) · movie-vs-series
+vetoes · year disambiguation · episode-count drift.
+
+## Project layout
+
+```
+src/main/java/com/dondeanime/animetitlematcher/
+├─ api/        AnimeTitleMatcher · MatchRequest/Result/Candidate/Decision/Explanation
+│              ScoreBreakdown · ScoringWeights · MatchThresholds       (public, stable)
+├─ domain/     AniListAnime · TmdbTitle · AnimeFormat · TmdbMediaType · TitleVariant
+└─ internal/   normalize · similarity · score · rules · support        (implementation detail)
+```
+
+Everything under `internal` is an implementation detail and not part of the stable API.
 
 ## Running the tests
 
 ```bash
-./mvnw test          # unit and end-to-end tests
-./mvnw clean verify  # full build, tests and JaCoCo coverage report (target/site/jacoco)
+./mvnw test          # unit + end-to-end tests
+./mvnw clean verify  # full build, tests and JaCoCo report (target/site/jacoco)
 ```
 
 Tests never touch the network and do not require TMDb or AniList access.
 
-## Adding new evaluation cases
+## Adding evaluation cases
 
-Append cases to [`src/test/resources/fixtures/matching-cases.json`](src/test/resources/fixtures/matching-cases.json).
-Each case provides an `anilist` object, a list of `candidates`, the `expectedTmdbId` (or `null`),
-and `expectMatch`. The `MatchingEvaluator` then reports accuracy over the whole set. See
+Append cases to
+[`src/test/resources/fixtures/matching-cases.json`](src/test/resources/fixtures/matching-cases.json) —
+each provides an `anilist` object, `candidates`, an `expectedTmdbId` (or `null`) and `expectMatch`.
+`MatchingEvaluator` then reports `total / correct / incorrect / noMatch / ambiguous / accuracy`. See
 [docs/evaluation.md](docs/evaluation.md).
 
 ## Limitations
 
-- The accuracy reported by the bundled evaluator reflects only the **small, curated sample** in this
-  repository, not the full DondeAnime dataset. It validates behaviour; it is not a benchmark.
-- No TMDb/AniList HTTP clients are shipped. The library works purely on the objects you pass in, so
+- The evaluator's accuracy reflects only the **small, curated sample** in this repository, not the
+  full DondeAnime dataset. It validates behaviour; it is not a benchmark.
+- No TMDb/AniList HTTP clients are shipped — the library works purely on the objects you pass in, so
   it stays offline, fast and testable.
 - Native (Japanese) titles only contribute when both sides carry comparable text (e.g. a TMDb
   `original_title` in Japanese).
@@ -227,14 +259,11 @@ and `expectMatch`. The `MatchingEvaluator` then reports accuracy over the whole 
 
 ## Technical decisions
 
-- **No external similarity library.** Levenshtein and Jaro-Winkler are implemented by hand so the
-  project demonstrates the underlying algorithms.
-- **Immutable models** (records with builders) and a small, stable public API under
-  `com.dondeanime.animetitlematcher.api` and `.domain`; everything under `.internal` is an
-  implementation detail.
-- **Explainability first.** Every result carries a breakdown and an explanation; scoring uses caps
+- **No external similarity library** — Levenshtein and Jaro-Winkler are implemented by hand.
+- **Immutable models** (records + builders) and a small, stable public API; internals are clearly separated.
+- **Explainability first** — every result carries a breakdown and an explanation; scoring uses caps
   instead of stacked penalties so it stays easy to reason about.
-- **Deterministic.** Candidate ordering uses an explicit score → id → input-order comparator.
+- **Deterministic** — candidate ordering uses an explicit score → id → input-order comparator.
 
 ## License
 
