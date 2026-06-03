@@ -1,0 +1,4 @@
+# JitPack build configuration.
+# The library targets Java 21, so JitPack must build it with a JDK 21 toolchain.
+jdk:
+  - openjdk21

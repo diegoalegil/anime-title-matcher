@@ -5,6 +5,7 @@
 **Match an AniList anime to its most probable TMDb entry — fuzzily, and explainably.**
 
 [![Java](https://img.shields.io/badge/Java-21-007396?logo=openjdk&logoColor=white)](https://openjdk.org/projects/jdk/21/)
+[![JitPack](https://jitpack.io/v/diegoalegil/anime-title-matcher.svg)](https://jitpack.io/#diegoalegil/anime-title-matcher)
 [![Build](https://img.shields.io/badge/build-Maven-C71A36?logo=apachemaven&logoColor=white)](https://maven.apache.org/)
 [![Tests](https://img.shields.io/badge/tests-147%20passing-2ea44f)](#running-the-tests)
 [![Runtime deps](https://img.shields.io/badge/runtime%20dependencies-0-2ea44f)](#stack)
@@ -68,16 +69,28 @@ titles. This library is a robust, well-tested implementation of that matching co
 
 ## Install
 
-```bash
-./mvnw clean install
-```
+Available from [JitPack](https://jitpack.io/#diegoalegil/anime-title-matcher) — add the repository
+and the dependency:
 
 ```xml
+<repositories>
+  <repository>
+    <id>jitpack.io</id>
+    <url>https://jitpack.io</url>
+  </repository>
+</repositories>
+
 <dependency>
-    <groupId>com.dondeanime</groupId>
-    <artifactId>anime-title-matcher</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+  <groupId>com.github.diegoalegil</groupId>
+  <artifactId>anime-title-matcher</artifactId>
+  <version>v0.1.0</version>
 </dependency>
+```
+
+Or build and install it locally (`com.dondeanime:anime-title-matcher:0.1.0`):
+
+```bash
+./mvnw clean install
 ```
 
 ## Quick start
