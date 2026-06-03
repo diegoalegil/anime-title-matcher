@@ -1,0 +1,28 @@
+[
+  {
+    "id": 113415,
+    "romajiTitle": "Jujutsu Kaisen",
+    "englishTitle": "Jujutsu Kaisen",
+    "nativeTitle": "呪術廻戦",
+    "year": 2020,
+    "format": "TV",
+    "episodes": 24
+  },
+  {
+    "id": 21519,
+    "romajiTitle": "Kimi no Na wa.",
+    "englishTitle": "Your Name.",
+    "nativeTitle": "君の名は。",
+    "year": 2016,
+    "format": "MOVIE",
+    "episodes": 1
+  },
+  {
+    "id": 20958,
+    "romajiTitle": "Shingeki no Kyojin Season 3 Part 2",
+    "englishTitle": "Attack on Titan Season 3 Part 2",
+    "synonyms": ["Attack on Titan"],
+    "year": 2019,
+    "format": "TV"
+  }
+]

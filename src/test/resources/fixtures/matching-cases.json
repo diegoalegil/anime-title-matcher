@@ -1,0 +1,234 @@
+{
+  "description": "A small, hand-built sample of AniList/TMDb matching cases used to measure the matcher. TMDb ids are illustrative; no network or real API is involved.",
+  "cases": [
+    {
+      "name": "Demon Slayer (native + english)",
+      "anilist": {
+        "id": 101922,
+        "romajiTitle": "Kimetsu no Yaiba",
+        "englishTitle": "Demon Slayer: Kimetsu no Yaiba",
+        "nativeTitle": "鬼滅の刃",
+        "year": 2019,
+        "format": "TV"
+      },
+      "candidates": [
+        { "id": 85937, "title": "Demon Slayer: Kimetsu no Yaiba", "originalTitle": "鬼滅の刃", "year": 2019, "mediaType": "tv" },
+        { "id": 31910, "title": "Naruto: Shippuden", "year": 2007, "mediaType": "tv" }
+      ],
+      "expectedTmdbId": 85937,
+      "expectMatch": true
+    },
+    {
+      "name": "Attack on Titan (alternative title)",
+      "anilist": {
+        "id": 16498,
+        "romajiTitle": "Shingeki no Kyojin",
+        "synonyms": ["Attack on Titan", "AoT"],
+        "nativeTitle": "進撃の巨人",
+        "year": 2013,
+        "format": "TV"
+      },
+      "candidates": [
+        { "id": 1429, "title": "Attack on Titan", "originalTitle": "進撃の巨人", "year": 2013, "mediaType": "tv" },
+        { "id": 30984, "title": "Bleach", "year": 2004, "mediaType": "tv" }
+      ],
+      "expectedTmdbId": 1429,
+      "expectMatch": true
+    },
+    {
+      "name": "My Hero Academia (english title)",
+      "anilist": {
+        "id": 21459,
+        "romajiTitle": "Boku no Hero Academia",
+        "englishTitle": "My Hero Academia",
+        "year": 2016,
+        "format": "TV"
+      },
+      "candidates": [
+        { "id": 65930, "title": "My Hero Academia", "year": 2016, "mediaType": "tv" },
+        { "id": 46260, "title": "Naruto", "year": 2002, "mediaType": "tv" }
+      ],
+      "expectedTmdbId": 65930,
+      "expectMatch": true
+    },
+    {
+      "name": "Jujutsu Kaisen 2nd Season (season stripped to show)",
+      "anilist": {
+        "id": 145064,
+        "romajiTitle": "Jujutsu Kaisen 2nd Season",
+        "englishTitle": "Jujutsu Kaisen Season 2",
+        "year": 2023,
+        "format": "TV"
+      },
+      "candidates": [
+        { "id": 95479, "title": "Jujutsu Kaisen", "year": 2020, "mediaType": "tv" },
+        { "id": 37854, "title": "One Piece", "year": 1999, "mediaType": "tv" }
+      ],
+      "expectedTmdbId": 95479,
+      "expectMatch": true
+    },
+    {
+      "name": "Kaguya-sama Ultra Romantic (subtitle overlap)",
+      "anilist": {
+        "id": 125367,
+        "romajiTitle": "Kaguya-sama wa Kokurasetai: Ultra Romantic",
+        "englishTitle": "Kaguya-sama: Love Is War - Ultra Romantic",
+        "year": 2022,
+        "format": "TV"
+      },
+      "candidates": [
+        { "id": 83121, "title": "Kaguya-sama: Love Is War", "year": 2019, "mediaType": "tv" },
+        { "id": 1535, "title": "Death Note", "year": 2006, "mediaType": "tv" }
+      ],
+      "expectedTmdbId": 83121,
+      "expectMatch": true
+    },
+    {
+      "name": "Frieren (subtitle, english)",
+      "anilist": {
+        "id": 154587,
+        "romajiTitle": "Sousou no Frieren",
+        "englishTitle": "Frieren: Beyond Journey's End",
+        "nativeTitle": "葬送のフリーレン",
+        "year": 2023,
+        "format": "TV"
+      },
+      "candidates": [
+        { "id": 209867, "title": "Frieren: Beyond Journey's End", "originalTitle": "葬送のフリーレン", "year": 2023, "mediaType": "tv" },
+        { "id": 240411, "title": "Solo Leveling", "year": 2024, "mediaType": "tv" }
+      ],
+      "expectedTmdbId": 209867,
+      "expectMatch": true
+    },
+    {
+      "name": "A Silent Voice (movie)",
+      "anilist": {
+        "id": 20954,
+        "romajiTitle": "Koe no Katachi",
+        "englishTitle": "A Silent Voice",
+        "year": 2016,
+        "format": "MOVIE"
+      },
+      "candidates": [
+        { "id": 378064, "title": "A Silent Voice", "year": 2016, "mediaType": "movie" },
+        { "id": 372058, "title": "Your Name.", "year": 2016, "mediaType": "movie" }
+      ],
+      "expectedTmdbId": 378064,
+      "expectMatch": true
+    },
+    {
+      "name": "Spirited Away (movie)",
+      "anilist": {
+        "id": 199,
+        "romajiTitle": "Sen to Chihiro no Kamikakushi",
+        "englishTitle": "Spirited Away",
+        "year": 2001,
+        "format": "MOVIE"
+      },
+      "candidates": [
+        { "id": 129, "title": "Spirited Away", "year": 2001, "mediaType": "movie" },
+        { "id": 128, "title": "Princess Mononoke", "year": 1997, "mediaType": "movie" }
+      ],
+      "expectedTmdbId": 129,
+      "expectMatch": true
+    },
+    {
+      "name": "Suzume (movie, short english title)",
+      "anilist": {
+        "id": 142770,
+        "romajiTitle": "Suzume no Tojimari",
+        "englishTitle": "Suzume",
+        "year": 2022,
+        "format": "MOVIE"
+      },
+      "candidates": [
+        { "id": 916224, "title": "Suzume", "year": 2022, "mediaType": "movie" },
+        { "id": 568160, "title": "Weathering with You", "year": 2019, "mediaType": "movie" }
+      ],
+      "expectedTmdbId": 916224,
+      "expectMatch": true
+    },
+    {
+      "name": "Steins;Gate (punctuation)",
+      "anilist": {
+        "id": 9253,
+        "romajiTitle": "Steins;Gate",
+        "englishTitle": "Steins;Gate",
+        "nativeTitle": "シュタインズ・ゲート",
+        "year": 2011,
+        "format": "TV",
+        "episodes": 24
+      },
+      "candidates": [
+        { "id": 42509, "title": "Steins;Gate", "year": 2011, "mediaType": "tv", "episodeCount": 24 },
+        { "id": 31132, "title": "Code Geass", "year": 2006, "mediaType": "tv" }
+      ],
+      "expectedTmdbId": 42509,
+      "expectMatch": true
+    },
+    {
+      "name": "Re:Zero (colon and dashes)",
+      "anilist": {
+        "id": 21355,
+        "romajiTitle": "Re:Zero kara Hajimeru Isekai Seikatsu",
+        "englishTitle": "Re:ZERO -Starting Life in Another World-",
+        "year": 2016,
+        "format": "TV"
+      },
+      "candidates": [
+        { "id": 65249, "title": "Re:ZERO -Starting Life in Another World-", "year": 2016, "mediaType": "tv" },
+        { "id": 60863, "title": "Konosuba", "year": 2016, "mediaType": "tv" }
+      ],
+      "expectedTmdbId": 65249,
+      "expectMatch": true
+    },
+    {
+      "name": "Bunny Girl Senpai (long localized title)",
+      "anilist": {
+        "id": 101291,
+        "romajiTitle": "Seishun Buta Yarou wa Bunny Girl Senpai no Yume wo Minai",
+        "englishTitle": "Rascal Does Not Dream of Bunny Girl Senpai",
+        "year": 2018,
+        "format": "TV"
+      },
+      "candidates": [
+        { "id": 81873, "title": "Rascal Does Not Dream of Bunny Girl Senpai", "year": 2018, "mediaType": "tv" },
+        { "id": 31964, "title": "Toradora!", "year": 2008, "mediaType": "tv" }
+      ],
+      "expectedTmdbId": 81873,
+      "expectMatch": true
+    },
+    {
+      "name": "Fullmetal Alchemist Brotherhood (year disambiguation)",
+      "anilist": {
+        "id": 5114,
+        "romajiTitle": "Fullmetal Alchemist: Brotherhood",
+        "englishTitle": "Fullmetal Alchemist: Brotherhood",
+        "year": 2009,
+        "format": "TV"
+      },
+      "candidates": [
+        { "id": 30991, "title": "Fullmetal Alchemist", "year": 2003, "mediaType": "tv" },
+        { "id": 31911, "title": "Fullmetal Alchemist: Brotherhood", "year": 2009, "mediaType": "tv" }
+      ],
+      "expectedTmdbId": 31911,
+      "expectMatch": true
+    },
+    {
+      "name": "No reliable match (unrelated candidates)",
+      "anilist": {
+        "id": 98202,
+        "romajiTitle": "Tsuki ga Kirei",
+        "englishTitle": "As the Moon, So Beautiful",
+        "year": 2017,
+        "format": "TV"
+      },
+      "candidates": [
+        { "id": 46260, "title": "Naruto", "year": 2002, "mediaType": "tv" },
+        { "id": 37854, "title": "One Piece", "year": 1999, "mediaType": "tv" }
+      ],
+      "expectedTmdbId": null,
+      "expectMatch": false
+    }
+  ]
+}

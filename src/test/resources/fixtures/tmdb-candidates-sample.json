@@ -1,0 +1,32 @@
+[
+  {
+    "id": 95479,
+    "title": "Jujutsu Kaisen",
+    "originalTitle": "呪術廻戦",
+    "year": 2020,
+    "mediaType": "tv",
+    "episodeCount": 47,
+    "originalLanguage": "ja",
+    "popularity": 142.5
+  },
+  {
+    "id": 372058,
+    "title": "Your Name.",
+    "originalTitle": "君の名は。",
+    "alternativeTitles": ["Kimi no Na wa."],
+    "year": 2016,
+    "mediaType": "movie",
+    "originalLanguage": "ja",
+    "popularity": 98.1
+  },
+  {
+    "id": 1429,
+    "title": "Attack on Titan",
+    "originalTitle": "進撃の巨人",
+    "year": 2013,
+    "mediaType": "tv",
+    "episodeCount": 88,
+    "originalLanguage": "ja",
+    "popularity": 210.7
+  }
+]
